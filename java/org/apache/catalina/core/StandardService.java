@@ -439,12 +439,14 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         setState(LifecycleState.STARTING);
 
         // Start our defined Container first
+        // 先启动容器
         if (container != null) {
             synchronized (container) {
                 container.start();
             }
         }
-
+        
+        // 启动线程池
         synchronized (executors) {
             for (Executor executor: executors) {
                 executor.start();
@@ -452,6 +454,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         }
 
         // Start our defined Connectors second
+        // 启动连接器
         synchronized (connectorsLock) {
             for (Connector connector: connectors) {
                 try {
@@ -541,11 +544,13 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         super.initInternal();
         
+        // 初始化容器
         if (container != null) {
             container.init();
         }
 
         // Initialize any Executors
+        // 初始化线程池
         for (Executor executor : findExecutors()) {
             if (executor instanceof LifecycleMBeanBase) {
                 ((LifecycleMBeanBase) executor).setDomain(getDomain());
@@ -554,6 +559,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         }
 
         // Initialize our defined Connectors
+        // 初始化连接器
         synchronized (connectorsLock) {
             for (Connector connector : connectors) {
                 try {

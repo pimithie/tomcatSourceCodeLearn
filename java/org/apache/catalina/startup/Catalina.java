@@ -292,7 +292,8 @@ public class Catalina {
      * Return a File object representing our configuration file.
      */
     protected File configFile() {
-
+    	
+    	// 读取 conf/server.xml 文件
         File file = new File(configFile);
         if (!file.isAbsolute()) {
             file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), configFile);
@@ -550,14 +551,15 @@ public class Catalina {
      * Start a new server instance.
      */
     public void load() {
-    	// 
+    	// 阻止重复加载
         if (loaded) {
             return;
         }
+        // 设置标志位
         loaded = true;
 
         long t1 = System.nanoTime();
-
+        
         initDirs();
 
         // Before digester - it may be needed
@@ -565,6 +567,7 @@ public class Catalina {
         initNaming();
 
         // Create and execute our Digester
+        // 创建Digester
         Digester digester = createStartDigester();
 
         InputSource inputSource = null;
@@ -572,6 +575,7 @@ public class Catalina {
         File file = null;
         try {
             try {
+            	// 读取server.xml文件
                 file = configFile();
                 inputStream = new FileInputStream(file);
                 inputSource = new InputSource(file.toURI().toURL().toString());
@@ -628,8 +632,11 @@ public class Catalina {
             }
 
             try {
+            	// 设置inputSource的字节流
                 inputSource.setByteStream(inputStream);
+                // 将当前Catalina对象压入栈顶
                 digester.push(this);
+                // 解析配置文件
                 digester.parse(inputSource);
             } catch (SAXParseException spe) {
                 log.warn("Catalina.start using " + getConfigFile() + ": " +
@@ -648,7 +655,8 @@ public class Catalina {
                 }
             }
         }
-
+        
+        // 获取server并设置Catalina对象
         getServer().setCatalina(this);
 
         // Stream redirection
@@ -656,6 +664,7 @@ public class Catalina {
 
         // Start the new server
         try {
+        	// 启动新的服务器
             getServer().init();
         } catch (LifecycleException e) {
             if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE")) {
@@ -693,11 +702,13 @@ public class Catalina {
      * Start a new server instance.
      */
     public void start() {
-
+    	
+    	// 若为null，则调用load方法
         if (getServer() == null) {
             load();
         }
-
+        
+        // 仍然为null，说明未配置server实例
         if (getServer() == null) {
             log.fatal("Cannot start server. Server instance is not configured.");
             return;
@@ -707,6 +718,7 @@ public class Catalina {
 
         // Start the new server
         try {
+        	// 调用StandardServer的start方法
             getServer().start();
         } catch (LifecycleException e) {
             log.fatal(sm.getString("catalina.serverStartFail"), e);

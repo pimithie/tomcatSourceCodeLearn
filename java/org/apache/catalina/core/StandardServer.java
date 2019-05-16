@@ -753,6 +753,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         globalNamingResources.start();
         
         // Start our defined Services
+        // 启动所有的StandardService
         synchronized (servicesLock) {
             for (int i = 0; i < services.length; i++) {
                 services[i].start();
@@ -836,6 +837,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             }
         }
         // Initialize our defined Services
+        // 初始化所有的StandardService
         for (int i = 0; i < services.length; i++) {
             services[i].init();
         }
