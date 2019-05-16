@@ -550,7 +550,7 @@ public class Catalina {
      * Start a new server instance.
      */
     public void load() {
-
+    	// 
         if (loaded) {
             return;
         }
