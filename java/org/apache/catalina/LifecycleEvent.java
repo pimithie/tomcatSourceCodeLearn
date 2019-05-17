@@ -45,7 +45,7 @@ public final class LifecycleEvent extends EventObject {
      * @param data Event data (if any)
      */
     public LifecycleEvent(Lifecycle lifecycle, String type, Object data) {
-
+    	// 将当前Lifecycle实现类作为事件源
         super(lifecycle);
         this.type = type;
         this.data = data;
@@ -83,6 +83,7 @@ public final class LifecycleEvent extends EventObject {
     /**
      * Return the Lifecycle on which this event occurred.
      */
+    // 返回当前事件源，即对应的Lifecycle的实现类
     public Lifecycle getLifecycle() {
 
         return (Lifecycle) getSource();

@@ -27,6 +27,7 @@ package org.apache.catalina;
  *
  * @author Craig R. McClanahan
  */
+// 对实现Lifecycle接口的组件的状态的监听器，当前对应的事件发生时，那个对应的监听器将被移除
 public interface LifecycleListener {
 
 
@@ -35,6 +36,7 @@ public interface LifecycleListener {
      *
      * @param event LifecycleEvent that has occurred
      */
+	// 对指定事件发生时进行相应处理
     public void lifecycleEvent(LifecycleEvent event);
 
 

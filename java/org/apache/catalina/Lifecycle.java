@@ -178,6 +178,7 @@ public interface Lifecycle {
      *
      * @param listener The listener to add
      */
+    // 给当前组件（component）添加一个生命周期监听器(LiftcycleListener)
     public void addLifecycleListener(LifecycleListener listener);
 
 
@@ -185,6 +186,7 @@ public interface Lifecycle {
      * Get the life cycle listeners associated with this life cycle. If this
      * component has no listeners registered, a zero-length array is returned.
      */
+    // 获取与当前组件相关联的生命周期监听器(LiftcycleListener)
     public LifecycleListener[] findLifecycleListeners();
 
 
@@ -193,6 +195,7 @@ public interface Lifecycle {
      *
      * @param listener The listener to remove
      */
+    // 从当前component中移除一个生命周期监听器(LiftcycleListener)
     public void removeLifecycleListener(LifecycleListener listener);
 
 
