@@ -194,9 +194,11 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             int errorDelay = 0;
 
             // Loop until we receive a shutdown command
+            // 循环执行，直到收到一个shutdown指令
             while (running) {
 
                 // Loop if endpoint is paused
+            	// 如果当前endpoint处于暂停状态，则进行循环，没过50ms进行一次探测
                 while (paused && running) {
                     state = AcceptorState.PAUSED;
                     try {
@@ -213,12 +215,14 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
 
                 try {
                     //if we have reached max connections, wait
+                	// 若达到最大连接数，则进行等待（自定义实现了一个同步工具，LimitLatch（AQS））
                     countUpOrAwaitConnection();
 
                     Socket socket = null;
                     try {
                         // Accept the next incoming connection from the server
                         // socket
+                    	// 调用ServerSocket的accept方法，获得连接(阻塞BIO)
                         socket = serverSocketFactory.acceptSocket(serverSocket);
                     } catch (IOException ioe) {
                         countDownConnection();
@@ -233,6 +237,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                     // Configure the socket
                     if (running && !paused && setSocketOptions(socket)) {
                         // Hand this socket off to an appropriate processor
+                    	// 对当前socket进行请求处理
                         if (!processSocket(socket)) {
                             countDownConnection();
                             // Close socket right away
@@ -297,10 +302,12 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             boolean launch = false;
             synchronized (socket) {
                 try {
+                	// 设置socket的状态为open
                     SocketState state = SocketState.OPEN;
 
                     try {
                         // SSL handshake
+                    	// 进行SSL握手(https)
                         serverSocketFactory.handshake(socket.getSocket());
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
@@ -310,8 +317,9 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                         // Tell to close the socket
                         state = SocketState.CLOSED;
                     }
-
+                    
                     if ((state != SocketState.CLOSED)) {
+                    	// 进行请求处理
                         if (status == null) {
                             state = handler.process(socket, SocketStatus.OPEN_READ);
                         } else {
@@ -489,7 +497,8 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     protected boolean setSocketOptions(Socket socket) {
         try {
             // 1: Set socket options: timeout, linger, etc
-            socketProperties.setProperties(socket);
+            // 设置socket属性参数
+        	socketProperties.setProperties(socket);
         } catch (SocketException s) {
             //error here is common if the client has reset the connection
             if (log.isDebugEnabled()) {
@@ -523,6 +532,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     protected boolean processSocket(Socket socket) {
         // Process the request from this socket
         try {
+        	// 将获取到的socket对象封装为SocketWrapper对象
             SocketWrapper<Socket> wrapper = new SocketWrapper<Socket>(socket);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
             wrapper.setSecure(isSSLEnabled());
@@ -530,6 +540,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             if (!running) {
                 return false;
             }
+            // 将封装之后SocketWrapper交付给线程池处理
             getExecutor().execute(new SocketProcessor(wrapper));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);

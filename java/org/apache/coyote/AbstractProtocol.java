@@ -574,35 +574,42 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         @SuppressWarnings("deprecation") // Old HTTP upgrade method has been deprecated
         public SocketState process(SocketWrapper<S> wrapper,
                 SocketStatus status) {
+        	// SocketWrapper为null，说明socket已经关闭了
             if (wrapper == null) {
                 // Nothing to do. Socket has been closed.
                 return SocketState.CLOSED;
             }
-
+            
+            // 获取socket对象
             S socket = wrapper.getSocket();
             if (socket == null) {
                 // Nothing to do. Socket has been closed.
                 return SocketState.CLOSED;
             }
-
+            
+            // 获取当前socket对应的Processor
             Processor<S> processor = connections.get(socket);
             if (status == SocketStatus.DISCONNECT && processor == null) {
                 // Nothing to do. Endpoint requested a close and there is no
                 // longer a processor associated with this socket.
                 return SocketState.CLOSED;
             }
-
+            
+            // 设置为非异步，即同步
             wrapper.setAsync(false);
             ContainerThreadMarker.markAsContainerThread();
 
             try {
+            	// processor为null，从recycledProcessors中获取
                 if (processor == null) {
                     processor = recycledProcessors.poll();
                 }
+                // 仍为null，则进行创建
                 if (processor == null) {
                     processor = createProcessor();
                 }
-
+                
+                //初始化SSL
                 initSsl(wrapper, processor);
 
                 SocketState state = SocketState.CLOSED;

@@ -1019,7 +1019,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Setting up the I/O
+        // 保持当前SocketWrapper
         setSocketWrapper(socketWrapper);
+        // 获取socket的InputStream和OutputStream
         getInputBuffer().init(socketWrapper, endpoint);
         getOutputBuffer().init(socketWrapper, endpoint);
 
@@ -1046,7 +1048,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // Parsing the request header
             try {
                 setRequestLineReadTimeout();
-
+                //解析http请求行
                 if (!getInputBuffer().parseRequestLine(keptAlive)) {
                     if (handleIncompleteRequestLineRead()) {
                         break;
@@ -1109,6 +1111,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 // Setting up filters, and parse some request headers
                 rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
                 try {
+                	// 解析某些请求头部行
                     prepareRequest();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
@@ -1134,6 +1137,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             if (!getErrorState().isError()) {
                 try {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+                    // 对请求进行处理
                     adapter.service(request, response);
                     // Handle when the response was committed before a serious
                     // error occurred.  Throwing a ServletException should both
@@ -1186,6 +1190,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     // to be closed occurred.
                     checkExpectationAndResponseStatus();
                 }
+                // 完成请求
                 endRequest();
             }
 

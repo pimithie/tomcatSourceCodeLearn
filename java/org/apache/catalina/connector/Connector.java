@@ -66,6 +66,7 @@ public class Connector extends LifecycleMBeanBase  {
         setProtocol(protocol);
         // Instantiate protocol handler
         try {
+        	// 创建对应的协议处理器(ProtocolHandler)
             Class<?> clazz = Class.forName(protocolHandlerClassName);
             this.protocolHandler = (ProtocolHandler) clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
@@ -590,9 +591,11 @@ public class Connector extends LifecycleMBeanBase  {
     public void setProtocol(String protocol) {
 
         if (AprLifecycleListener.isAprAvailable()) {
+        	// http/1.1协议处理器对应的class
             if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName
                 ("org.apache.coyote.http11.Http11AprProtocol");
+             // AJP/1.31协议处理器对应的class
             } else if ("AJP/1.3".equals(protocol)) {
                 setProtocolHandlerClassName
                 ("org.apache.coyote.ajp.AjpAprProtocol");
