@@ -659,6 +659,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         // Process the connection
         try {
             //disable blocking, APR style, we are gonna be polling it
+        	// 设置为channel为非阻塞模式
             socket.configureBlocking(false);
             Socket sock = socket.socket();
             socketProperties.setProperties(sock);
@@ -690,6 +691,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     channel.reset();
                 }
             }
+            // 注册channel到poller上
             getPoller0().register(channel);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -824,6 +826,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     try {
                         // Accept the next incoming connection from the server
                         // socket
+                    	// 阻塞式accept，获取对应的SocketChannel
                         socket = serverSock.accept();
                     } catch (IOException ioe) {
                         //we didn't get a socket
@@ -839,6 +842,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     // setSocketOptions() will add channel to the poller
                     // if successful
                     if (running && !paused) {
+                    	// 将接收的到SocketChannel设置相应的socket参数，并注册到poller（轮询器）上
                         if (!setSocketOptions(socket)) {
                             countDownConnection();
                             closeSocket(socket);

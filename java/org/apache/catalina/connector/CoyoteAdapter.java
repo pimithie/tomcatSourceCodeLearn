@@ -438,6 +438,7 @@ public class CoyoteAdapter implements Adapter {
             // Parse and set Catalina and configuration specific
             // request parameters
             req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
+            // 进行请求参数解析
             postParseSuccess = postParseRequest(req, request, res, response);
             if (postParseSuccess) {
                 //check valves if we support async
@@ -707,6 +708,7 @@ public class CoyoteAdapter implements Adapter {
         // Parse the path parameters. This will:
         //   - strip out the path parameters
         //   - convert the decodedURI to bytes
+        // 解析路径参数
         parsePathParameters(req, request);
 
         // URI decoding

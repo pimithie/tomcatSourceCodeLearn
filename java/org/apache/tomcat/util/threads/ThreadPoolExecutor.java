@@ -161,10 +161,14 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * @throws NullPointerException if command or unit is null
      */
     public void execute(Runnable command, long timeout, TimeUnit unit) {
+    	// 记录提交的任务数
         submittedCount.incrementAndGet();
         try {
+        	// 调用jdk的线程池的execute方法
             super.execute(command);
+            // catch住jdk线程池抛出RejectedExecutionException异常，并将任务放入队列中
         } catch (RejectedExecutionException rx) {
+        	// 若为tomcat自定义扩展的TaskQueue
             if (super.getQueue() instanceof TaskQueue) {
                 final TaskQueue queue = (TaskQueue)super.getQueue();
                 try {

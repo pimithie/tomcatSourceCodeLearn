@@ -115,7 +115,8 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
      */
     @Override
     protected void startInternal() throws LifecycleException {
-
+    	
+    	// 创建tomcat自定义的TaskQueue，解决无界队列的造成了线程数到达不了maxThreads数的bug
         taskqueue = new TaskQueue(maxQueueSize);
         TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
         executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
@@ -123,6 +124,7 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         if (prestartminSpareThreads) {
             executor.prestartAllCoreThreads();
         }
+        // 设置taskqueue的parent属性，保存其所在的线程池的引用
         taskqueue.setParent(executor);
 
         setState(LifecycleState.STARTING);
