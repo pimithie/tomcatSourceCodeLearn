@@ -63,6 +63,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     /**
      * Associated server socket.
      */
+    // 当前Endpoint关联的ServerSocket
     protected ServerSocket serverSocket = null;
 
 
@@ -71,9 +72,11 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     public JIoEndpoint() {
         // Set maxConnections to zero so we can tell if the user has specified
         // their own value on the connector when we reach bind()
+    	// 设置最大的Connection数为0，
         setMaxConnections(0);
         // Reduce the executor timeout for BIO as threads in keep-alive will not
         // terminate when the executor interrupts them.
+        // 不等待Executor中断其中的线程
         setExecutorTerminationTimeoutMillis(0);
     }
 
@@ -82,6 +85,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     /**
      * Handling of accepted sockets.
      */
+    // 接收到的socket处理器
     protected Handler handler = null;
     public void setHandler(Handler handler ) { this.handler = handler; }
     public Handler getHandler() { return handler; }
@@ -89,6 +93,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     /**
      * Server socket factory.
      */
+    // ServerSocket工厂
     protected ServerSocketFactory serverSocketFactory = null;
     public void setServerSocketFactory(ServerSocketFactory factory) { this.serverSocketFactory = factory; }
     public ServerSocketFactory getServerSocketFactory() { return serverSocketFactory; }
@@ -96,6 +101,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     /**
      * Port in use.
      */
+    // ServerSocket端口
     @Override
     public int getLocalPort() {
         ServerSocket s = serverSocket;
@@ -138,6 +144,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     /**
      * Async timeout thread
      */
+    // 异步超时线程的Runnable
     protected class AsyncTimeout implements Runnable {
         /**
          * The background thread that checks async requests and fires the
@@ -147,6 +154,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
         public void run() {
 
             // Loop until we receive a shutdown command
+        	// 循环直到接收到shutdown指令
             while (running) {
                 try {
                     Thread.sleep(1000);
@@ -154,8 +162,10 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                     // Ignore
                 }
                 long now = System.currentTimeMillis();
+                // 获取正在等待处理的请求
                 Iterator<SocketWrapper<Socket>> sockets =
                     waitingRequests.iterator();
+                // 进行遍历
                 while (sockets.hasNext()) {
                     SocketWrapper<Socket> socket = sockets.next();
                     long access = socket.getLastAccess();
@@ -168,6 +178,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                 }
 
                 // Loop if endpoint is paused
+                // 当Endpoint处于暂停状态时，循环等待
                 while (paused && running) {
                     try {
                         Thread.sleep(1000);
@@ -186,6 +197,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
      * The background thread that listens for incoming TCP/IP connections and
      * hands them off to an appropriate processor.
      */
+    // 接收到来的TCP的连接，并转发给相应的SocketProcessor进行处理
     protected class Acceptor extends AbstractEndpoint.Acceptor {
 
         @Override
@@ -384,15 +396,18 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     public void bind() throws Exception {
 
         // Initialize thread count defaults for acceptor
+    	// 初始化acceptor的线程数
         if (acceptorThreadCount == 0) {
             acceptorThreadCount = 1;
         }
         // Initialize maxConnections
+        // 初始化最大连接数
         if (getMaxConnections() == 0) {
             // User hasn't set a value - use the default
             setMaxConnections(getMaxThreadsWithExecutor());
         }
-
+        
+        // 创建ServerSocket工厂
         if (serverSocketFactory == null) {
             if (isSSLEnabled()) {
                 serverSocketFactory =
@@ -401,7 +416,8 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                 serverSocketFactory = new DefaultServerSocketFactory(this);
             }
         }
-
+        
+        // 通过ServerSocket工厂创建ServerSocket
         if (serverSocket == null) {
             try {
                 if (getAddress() == null) {
