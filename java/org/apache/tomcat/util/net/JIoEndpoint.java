@@ -295,10 +295,12 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
      * external Executor thread pool.
      */
     protected class SocketProcessor implements Runnable {
-
+    	
+    	// 被当前SocketProcessor处理的socket
         protected SocketWrapper<Socket> socket = null;
         protected SocketStatus status = null;
-
+        
+        // ---------------------构造器，初始化成员变量------------
         public SocketProcessor(SocketWrapper<Socket> socket) {
             if (socket==null) throw new NullPointerException();
             this.socket = socket;
@@ -310,6 +312,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
         }
 
         @Override
+        // 核心处理逻辑（提交给一个线程进行处理）
         public void run() {
             boolean launch = false;
             synchronized (socket) {
