@@ -140,12 +140,14 @@ public class StandardWrapper extends ContainerBase
     /**
      * The (single) possibly uninitialized instance of this servlet.
      */
+    // 当前serlvet实例
     protected volatile Servlet instance = null;
 
 
     /**
      * Flag that indicates if this instance has been initialized
      */
+    // 当前servlet实例是否已经初始化（servlet为单例）
     protected volatile boolean instanceInitialized = false;
 
     /**
@@ -158,12 +160,15 @@ public class StandardWrapper extends ContainerBase
      * The load-on-startup order value (negative value means load on
      * first call) for this servlet.
      */
+    // 获得在tomcat容器启动时，加载当前servlet的顺序值（order value），
+    // 若为负数，表示在第一次访问当前serlvet时进行实例化（默认情况）
     protected int loadOnStartup = -1;
 
 
     /**
      * Mappings associated with the wrapper.
      */
+    // 当前servlet的mapping，url路径与serlvet实例的映射关系
     protected ArrayList<String> mappings = new ArrayList<String>();
 
 
@@ -171,6 +176,7 @@ public class StandardWrapper extends ContainerBase
      * The initialization parameters for this servlet, keyed by
      * parameter name.
      */
+    // serlvet的初始化参数
     protected HashMap<String, String> parameters = new HashMap<String, String>();
 
 
@@ -237,6 +243,7 @@ public class StandardWrapper extends ContainerBase
     /**
      * True if this StandardWrapper is for the JspServlet
      */
+    // 当前serlvet是否为一个jsp serlvet
     protected boolean isJspServlet;
 
 
@@ -832,6 +839,7 @@ public class StandardWrapper extends ContainerBase
         boolean newInstance = false;
 
         // If not SingleThreadedModel, return the same instance every time
+        // 双if+synchronized+volatile实现的单例模式
         if (!singleThreadModel) {
             // Load and initialize our instance if necessary
             if (instance == null || !instanceInitialized) {
@@ -844,6 +852,7 @@ public class StandardWrapper extends ContainerBase
 
                             // Note: We don't know if the Servlet implements
                             // SingleThreadModel until we have loaded it.
+                            // 加载servlet
                             instance = loadServlet();
                             newInstance = true;
                             if (!singleThreadModel) {
@@ -859,6 +868,7 @@ public class StandardWrapper extends ContainerBase
                             throw new ServletException(sm.getString("standardWrapper.allocate"), e);
                         }
                     }
+                    // 调用serlvet的init方法
                     if (!instanceInitialized) {
                         initServlet(instance);
                     }

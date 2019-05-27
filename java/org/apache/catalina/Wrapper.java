@@ -46,6 +46,7 @@ import javax.servlet.UnavailableException;
  *
  * @author Craig R. McClanahan
  */
+// 代表容器中的一个servlet实例，管理的当前servlet的生命周期，在适当的时候调用的servlet的init和destroy方法
 public interface Wrapper extends Container {
 
     /**
@@ -86,6 +87,8 @@ public interface Wrapper extends Container {
      * Return the load-on-startup order value (negative value means
      * load on first call).
      */
+    // 获得在tomcat容器启动时，加载当前servlet的顺序值（order value），
+    // 若为负数，表示在第一次访问当前serlvet时进行实例化（默认情况）
     public int getLoadOnStartup();
 
 
@@ -95,12 +98,14 @@ public interface Wrapper extends Container {
      *
      * @param value New load-on-startup value
      */
+    // 设置load-on-startup的顺序值
     public void setLoadOnStartup(int value);
 
 
     /**
      * Return the run-as identity for this servlet.
      */
+    // 获得当前servlet的运行时标志
     public String getRunAs();
 
 
@@ -109,12 +114,14 @@ public interface Wrapper extends Container {
      *
      * @param runAs New run-as identity value
      */
+    // 设置当前servlet的运行时标志
     public void setRunAs(String runAs);
 
 
     /**
      * Return the fully qualified servlet class name for this servlet.
      */
+    // 获得当前servlet的Class name，用于反射创建对象
     public String getServletClass();
 
 
@@ -123,6 +130,7 @@ public interface Wrapper extends Container {
      *
      * @param servletClass Servlet class name
      */
+    // 设置当前servlet的Class name
     public void setServletClass(String servletClass);
 
 
@@ -136,6 +144,7 @@ public interface Wrapper extends Container {
      * @return Array of names of the methods supported by the underlying
      * servlet
      */
+    // 当前servlet支持方法
     public String[] getServletMethods() throws ServletException;
 
 
@@ -148,12 +157,14 @@ public interface Wrapper extends Container {
     /**
      * Return the associated servlet instance.
      */
+    // 返回当前serlvet实例
     public Servlet getServlet();
 
 
     /**
      * Set the associated servlet instance
      */
+    // 设置当前serlvet实例
     public void setServlet(Servlet servlet);
 
     // --------------------------------------------------------- Public Methods
@@ -165,6 +176,7 @@ public interface Wrapper extends Container {
      * @param name Name of this initialization parameter to add
      * @param value Value of this initialization parameter to add
      */
+    // 添加serlvet的初始化参数，---->web.xml中配置的参数
     public void addInitParameter(String name, String value);
 
 
@@ -181,6 +193,7 @@ public interface Wrapper extends Container {
      *
      * @param mapping The new wrapper mapping
      */
+    // 添加当前serlvet的mapping
     public void addMapping(String mapping);
 
 

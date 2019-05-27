@@ -299,7 +299,8 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                                                classTypeUsedInService, 
                                                args,
                                                principal);   
-                } else {  
+                } else {
+                	// 调用对应servlet的service方法
                     servlet.service(request, response);
                 }
             } else {

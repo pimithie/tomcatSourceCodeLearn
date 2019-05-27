@@ -146,6 +146,7 @@ public class DefaultInstanceManager implements InstanceManager {
     InvocationTargetException, NamingException, InstantiationException,
     ClassNotFoundException, IllegalArgumentException, NoSuchMethodException, SecurityException {
         Class<?> clazz = loadClassMaybePrivileged(className, classLoader);
+        // 通过反射创建对象
         return newInstance(clazz.getDeclaredConstructor().newInstance(), clazz);
     }
 
