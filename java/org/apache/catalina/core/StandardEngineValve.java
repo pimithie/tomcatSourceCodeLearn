@@ -100,7 +100,9 @@ final class StandardEngineValve
         throws IOException, ServletException {
 
         // Select the Host to be used for this Request
+    	// 获取当前请求对应的Host容器
         Host host = request.getHost();
+        // 若Host为null，则直接返回400错误
         if (host == null) {
             response.sendError
                 (HttpServletResponse.SC_BAD_REQUEST,
@@ -113,6 +115,7 @@ final class StandardEngineValve
         }
 
         // Ask this Host to process this request
+        // Engine调用的Host的Pipeline   Engine--->Host--->Context--->Wrapper
         host.getPipeline().getFirst().invoke(request, response);
 
     }

@@ -63,6 +63,7 @@ public class StandardEngine extends ContainerBase implements Engine {
     public StandardEngine() {
 
         super();
+        // 设置basic的Valve
         pipeline.setBasic(new StandardEngineValve());
         /* Set the jmvRoute using the system property jvmRoute */
         try {
@@ -83,6 +84,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      * Host name to use when no server host, or an unknown host,
      * is specified in the request.
      */
+    // 默认的host
     private String defaultHost = null;
 
 
@@ -96,6 +98,7 @@ public class StandardEngine extends ContainerBase implements Engine {
     /**
      * The <code>Service</code> that owns this Engine, if any.
      */
+    // 外层service容器
     private Service service = null;
 
     /** Allow the base dir to be specified explicitly for
@@ -155,6 +158,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      * @param host The new default host
      */
     @Override
+    // 设置对应的host
     public void setDefaultHost(String host) {
 
         String oldDefaultHost = this.defaultHost;
@@ -195,6 +199,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      * Return the <code>Service</code> with which we are associated (if any).
      */
     @Override
+    // 获取service
     public Service getService() {
 
         return (this.service);
@@ -207,11 +212,13 @@ public class StandardEngine extends ContainerBase implements Engine {
      *
      * @param service The service that owns this Engine
      */
+    // 设置当前Engine关联的service
     @Override
     public void setService(Service service) {
         this.service = service;
     }
-
+    
+    // 获取基目录
     public String getBaseDir() {
         if( baseDir==null ) {
             baseDir=System.getProperty(Globals.CATALINA_BASE_PROP);
@@ -221,7 +228,8 @@ public class StandardEngine extends ContainerBase implements Engine {
         }
         return baseDir;
     }
-
+    
+    // 设置基目录
     public void setBaseDir(String baseDir) {
         this.baseDir = baseDir;
     }
@@ -236,8 +244,10 @@ public class StandardEngine extends ContainerBase implements Engine {
      * @param child Child container to be added
      */
     @Override
+    // 添加host子容器
     public void addChild(Container child) {
-
+    	
+    	// 若不是host容器，则抛出异常
         if (!(child instanceof Host))
             throw new IllegalArgumentException
                 (sm.getString("standardEngine.notHost"));
@@ -265,6 +275,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      * @param container Proposed parent Container
      */
     @Override
+    // 设置父容器，由于Engine为Container的顶层容器，所以不能设置父容器
     public void setParent(Container container) {
 
         throw new IllegalArgumentException

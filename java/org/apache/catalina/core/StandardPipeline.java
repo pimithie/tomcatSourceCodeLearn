@@ -88,12 +88,14 @@ public class StandardPipeline extends LifecycleBase
     /**
      * The basic Valve (if any) associated with this Pipeline.
      */
+    // 基础valve
     protected Valve basic = null;
 
 
     /**
      * The Container with which this Pipeline is associated.
      */
+    // 当前pipeline关联的容器
     protected Container container = null;
 
 
@@ -106,6 +108,7 @@ public class StandardPipeline extends LifecycleBase
     /**
      * The first valve associated with this Pipeline.
      */
+    // 获取valve链的首结点
     protected Valve first = null;
     
     // --------------------------------------------------------- Public Methods
@@ -357,11 +360,13 @@ public class StandardPipeline extends LifecycleBase
         }
 
         // Add this Valve to the set associated with this Pipeline
+        // 添加新的valve到链表的尾部
         if (first == null) {
             first = valve;
             valve.setNext(basic);
         } else {
             Valve current = first;
+            // 对链表的遍历操作
             while (current != null) {
                 if (current.getNext() == basic) {
                     current.setNext(valve);
@@ -469,10 +474,11 @@ public class StandardPipeline extends LifecycleBase
 
     @Override
     public Valve getFirst() {
+    	//若有第一个valve，则直接返回
         if (first != null) {
             return first;
         }
-        
+        // 否则直接返回basic valve
         return basic;
     }
 }
