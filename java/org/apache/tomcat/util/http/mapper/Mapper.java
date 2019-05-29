@@ -1275,6 +1275,7 @@ public final class Mapper {
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
+    //  有序数组查找（二分）
     private static final int findIgnoreCase(MapElement[] map, CharChunk name,
                                   int start, int end) {
 
