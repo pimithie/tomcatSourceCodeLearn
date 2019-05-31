@@ -419,10 +419,12 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     @Override
     public void await() {
         // Negative values - don't wait on port - tomcat is embedded or we just don't like ports
-        if( port == -2 ) {
+        // 负值，并不监听某个端口
+    	if( port == -2 ) {
             // undocumented yet - for embedding apps that are around, alive.
             return;
         }
+    	// 不监听端口，每过10s查看一下是否tomcat需要关闭
         if( port==-1 ) {
             try {
                 awaitThread = Thread.currentThread();
@@ -441,6 +443,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         // Set up a server socket to wait on
         try {
+        	// 创建ServerSocket，监听某个端口，获取SHUTDOWN指令
             awaitSocket = new ServerSocket(port, 1,
                     InetAddress.getByName(address));
         } catch (IOException e) {
@@ -467,6 +470,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     InputStream stream;
                     long acceptStartTime = System.currentTimeMillis();
                     try {
+                    	// 接收socket连接
                         socket = serverSocket.accept();
                         socket.setSoTimeout(10 * 1000);  // Ten seconds
                         stream = socket.getInputStream();
@@ -490,6 +494,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     }
 
                     // Read a set of characters from the socket
+                    // 从socket中读取数据
                     int expected = 1024; // Cut off to avoid DoS attack
                     while (expected < shutdown.length()) {
                         if (random == null)
@@ -523,6 +528,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 }
 
                 // Match against our command string
+                // 判断读取到的指令是否为shutdown指令
                 boolean match = command.toString().equals(shutdown);
                 if (match) {
                     log.info(sm.getString("standardServer.shutdownViaPort"));

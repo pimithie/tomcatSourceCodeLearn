@@ -751,7 +751,9 @@ public class Catalina {
                         false);
             }
         }
-
+        
+        // 唯一的非守护线程进行等待，
+        // 监听8005端口(默认)，接收SHUTDOWN密令
         if (await) {
             await();
             stop();
