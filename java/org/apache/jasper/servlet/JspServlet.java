@@ -66,9 +66,12 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     // Logger
     private final transient Log log = LogFactory.getLog(JspServlet.class);
-
+    
+    // ServletContext对象
     private transient ServletContext context;
+    // ServletConfig
     private ServletConfig config;
+    // 当前具体的jsp引擎的初始化参数
     private transient Options options;
     private transient JspRuntimeContext rctxt;
     // jspFile for a jsp configured explicitly as a servlet, in environments where this
@@ -83,17 +86,20 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     public void init(ServletConfig config) throws ServletException {
 
         super.init(config);
+        // 获取ServletConfig和ServletContext对象
         this.config = config;
         this.context = config.getServletContext();
 
         // Initialize the JSP Runtime Context
         // Check for a custom Options implementation
+        // 获取jsp引擎参数名
         String engineOptionsName = config.getInitParameter("engineOptionsClass");
         if (Constants.IS_SECURITY_ENABLED && engineOptionsName != null) {
             log.info(Localizer.getMessage(
                     "jsp.info.ignoreSetting", "engineOptionsClass", engineOptionsName));
             engineOptionsName = null;
         }
+        // 加载自定义的jsp引擎
         if (engineOptionsName != null) {
             // Instantiate the indicated Options implementation
             try {
@@ -113,6 +119,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             }
         } else {
             // Use the default Options implementation
+        	// 使用tomcat默认的jsp引擎
             options = new EmbeddedServletOptions(config, context);
         }
         rctxt = new JspRuntimeContext(context, options);
@@ -283,7 +290,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 throws ServletException, IOException {
         //jspFile may be configured as an init-param for this servlet instance
         String jspUri = jspFile;
-
+        
+        // 拼接jsp文件路径
         if (jspUri == null) {
             // JSP specified via <jsp-file> in <servlet> declaration and
             // supplied through custom servlet container code
@@ -336,6 +344,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
         try {
             boolean precompile = preCompile(request);
+            // 读取jsp文件进行响应
             serviceJspFile(request, response, jspUri, precompile);
         } catch (RuntimeException e) {
             throw e;
@@ -384,6 +393,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                         handleMissingResource(request, response, jspUri);
                         return;
                     }
+                    // 创建JspServletWrapper
                     wrapper = new JspServletWrapper(config, options, jspUri,
                                                     rctxt);
                     rctxt.addWrapper(jspUri,wrapper);
@@ -392,6 +402,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         }
 
         try {
+        	// 读取jsp文件进行响应
             wrapper.service(request, response, precompile);
         } catch (FileNotFoundException fnfe) {
             handleMissingResource(request, response, jspUri);

@@ -388,10 +388,12 @@ public class JspServletWrapper {
             /*
              * (1) Compile
              */
+            // 进行jsp文件的编译生成xxx_jsp.java
             if (options.getDevelopment() || mustCompile) {
                 synchronized (this) {
                     if (options.getDevelopment() || mustCompile) {
                         // The following sets reload to true, if necessary
+                    	// 进行jsp编译
                         ctxt.compile();
                         mustCompile = false;
                     }
@@ -406,6 +408,7 @@ public class JspServletWrapper {
             /*
              * (2) (Re)load servlet class file
              */
+            // 加载servlet字节码文件
             servlet = getServlet();
 
             // If a page is to be precompiled only, return.
@@ -462,6 +465,7 @@ public class JspServletWrapper {
             /*
              * (4) Service request
              */
+            // 响应请求
             if (servlet instanceof SingleThreadModel) {
                // sync on the wrapper so that the freshness
                // of the page is determined right before servicing
