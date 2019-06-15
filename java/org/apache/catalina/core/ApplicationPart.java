@@ -40,8 +40,10 @@ import org.apache.tomcat.util.http.parser.HttpParser;
  * {@link Part}s.
  */
 public class ApplicationPart implements Part {
-
+	
+	// 当前ApplicationPart对应的FileItem
     private final FileItem fileItem;
+    // 文件存储的路径(若当前给定是相对路径，则将此路径拼接上去)
     private final File location;
 
     public ApplicationPart(FileItem fileItem, File location) {
@@ -113,6 +115,7 @@ public class ApplicationPart implements Part {
     @Override
     public void write(String fileName) throws IOException {
         File file = new File(fileName);
+        // 若不是绝对路径，则拼接当前配置的路径location
         if (!file.isAbsolute()) {
             file = new File(location, fileName);
         }
@@ -144,15 +147,19 @@ public class ApplicationPart implements Part {
      */
     public String getSubmittedFileName() {
         String fileName = null;
+        // http请求头部字段Content-Disposition值
         String cd = getHeader("Content-Disposition");
         if (cd != null) {
             String cdl = cd.toLowerCase(Locale.ENGLISH);
+            // 判断是否以form-data或者attachment开头
             if (cdl.startsWith("form-data") || cdl.startsWith("attachment")) {
+            	// 创建参数解析器
                 ParameterParser paramParser = new ParameterParser();
                 paramParser.setLowerCaseNames(true);
                 // Parameter parser can handle null input
                 Map<String,String> params = paramParser.parse(cd, ';');
                 if (params.containsKey("filename")) {
+                	// 获取文件名称
                     fileName = params.get("filename");
                     // The parser will remove surrounding '"' but will not
                     // unquote any \x sequences.

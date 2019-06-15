@@ -33,23 +33,27 @@ public interface Part {
      * Obtain an <code>InputStream</code> that can be used to retrieve the
      * contents of the file.
      */
+	// 获得一个可以上传文件的InputStream
     public InputStream getInputStream() throws IOException;
 
     /**
      * Obtain the content type passed by the browser or <code>null</code> if not
      * defined.
      */
+    // 获取当前http请求的ContentType
     public String getContentType();
 
     /**
      * Obtain the name of the field in the multipart form corresponding to this
      * part.
      */
+    // 获取当前part字段的名字
     public String getName();
 
     /**
      * Obtain the size of this part.
      */
+    // 获取当前Part的字节数
     public long getSize();
 
     /**
@@ -67,6 +71,7 @@ public interface Part {
      *                  stored. Relative locations are relative to {@link
      *                  javax.servlet.MultipartConfigElement#getLocation()}
      */
+    // 将上传的part直接写入到磁盘上
     public void write(String fileName) throws IOException;
 
     /**
@@ -80,6 +85,7 @@ public interface Part {
      * associated storage when the associated request has finished processing.
      * Behaviour of other containers may be different.
      */
+    // 删除当前part中的数据(包括临时文件等)
     public void delete() throws IOException;
     
     /**
