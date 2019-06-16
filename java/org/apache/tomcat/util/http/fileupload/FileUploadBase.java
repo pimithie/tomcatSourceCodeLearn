@@ -285,14 +285,18 @@ public abstract class FileUploadBase {
             if (fac == null) {
                 throw new NullPointerException("No FileItemFactory has been set.");
             }
+            // 迭代所有的multipart
             while (iter.hasNext()) {
                 final FileItemStream item = iter.next();
                 // Don't use getName() here to prevent an InvalidFileNameException.
+                // 获取文件名
                 final String fileName = ((FileItemIteratorImpl.FileItemStreamImpl) item).name;
+                // 通过DiskFileItemFactory创建FileItem
                 FileItem fileItem = fac.createItem(item.getFieldName(), item.getContentType(),
                                                    item.isFormField(), fileName);
                 items.add(fileItem);
                 try {
+                	// 从给定的InputStream中复制到给定的OutPutStream
                     Streams.copy(item.openStream(), fileItem.getOutputStream(), true);
                 } catch (FileUploadIOException e) {
                     throw (FileUploadException) e.getCause();

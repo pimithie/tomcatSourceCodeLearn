@@ -2835,13 +2835,17 @@ implements HttpServletRequest {
     private void parseParts() {
 
         // Return immediately if the parts have already been parsed
+    	// 如果已经解析过了，则直接return
         if (parts != null || partsParseException != null) {
             return;
         }
-
+        
+        // 获取MultipartConfigElement
         MultipartConfigElement mce = getWrapper().getMultipartConfigElement();
-
+        
+        // 为nul说明请求中不携带multipart
         if (mce == null) {
+        	// 如果当前请求对应的servlet没有进行multipart config去解析multipart/form-data
             if(getContext().getAllowCasualMultipartParsing()) {
                 mce = new MultipartConfigElement(null,
                         connector.getMaxPostSize(),
@@ -2854,17 +2858,20 @@ implements HttpServletRequest {
         }
 
         Parameters parameters = coyoteRequest.getParameters();
+        // 设置参数的最大数量
         parameters.setLimit(getConnector().getMaxParameterCount());
 
         boolean success = false;
         try {
             File location;
             String locationStr = mce.getLocation();
+            // 若未设置文件的location，则将location设置为tempdir(临时目录)
             if (locationStr == null || locationStr.length() == 0) {
                 location = ((File) context.getServletContext().getAttribute(
                         ServletContext.TEMPDIR));
             } else {
                 // If relative, it is relative to TEMPDIR
+            	// 又如果为相对路径，则为相对于tempdir
                 location = new File(locationStr);
                 if (!location.isAbsolute()) {
                     location = new File(
@@ -2873,7 +2880,8 @@ implements HttpServletRequest {
                             locationStr).getAbsoluteFile();
                 }
             }
-
+            
+            // 如果路径不是目录，则抛出异常
             if (!location.isDirectory()) {
                 parameters.setParseFailedReason(FailReason.MULTIPART_CONFIG_INVALID);
                 partsParseException = new IOException(
@@ -2884,40 +2892,50 @@ implements HttpServletRequest {
 
 
             // Create a new file upload handler
+            // 创建一个新的文件上传处理器
             DiskFileItemFactory factory = new DiskFileItemFactory();
             try {
+            	// 设置工厂的"仓库"，即对应的一个目录
                 factory.setRepository(location.getCanonicalFile());
             } catch (IOException ioe) {
                 parameters.setParseFailedReason(FailReason.IO_ERROR);
                 partsParseException = ioe;
                 return;
             }
+            // 获取文件大小的阈值
             factory.setSizeThreshold(mce.getFileSizeThreshold());
-
+            
+            // 创建一个文件上传的工具类ServletFileUpload
             ServletFileUpload upload = new ServletFileUpload();
+            // 设置工具的属性
             upload.setFileItemFactory(factory);
             upload.setFileSizeMax(mce.getMaxFileSize());
             upload.setSizeMax(mce.getMaxRequestSize());
 
             parts = new ArrayList<Part>();
             try {
+            	// 解析请求获得上传的文件
                 List<FileItem> items =
                         upload.parseRequest(new ServletRequestContext(this));
                 int maxPostSize = getConnector().getMaxPostSize();
                 int postSize = 0;
+                // 获得当前请求的字符编码
                 String enc = getCharacterEncoding();
                 Charset charset = null;
                 if (enc != null) {
                     try {
+                    	// 获取对应的字符集
                         charset = B2CConverter.getCharset(enc);
                     } catch (UnsupportedEncodingException e) {
                         // Ignore
                     }
                 }
+                // 遍历所有的FileItem，转化为Part（ApplicationPart）
                 for (FileItem item : items) {
                     ApplicationPart part = new ApplicationPart(item, location);
                     parts.add(part);
                     if (part.getSubmittedFileName() == null) {
+                    	// 获取当前multipart对应的字段名
                         String name = part.getName();
                         String value = null;
                         try {
@@ -2940,6 +2958,7 @@ implements HttpServletRequest {
                         if (maxPostSize >= 0) {
                             // Have to calculate equivalent size. Not completely
                             // accurate but close enough.
+                        	// 比较post上传的字节数与maxPostSize
                             if (charset == null) {
                                 // Name length
                                 postSize += name.getBytes().length;
@@ -2954,6 +2973,7 @@ implements HttpServletRequest {
                             }
                             // Value separator
                             postSize++;
+                            // 如果post上传的字节数大于maxPostSize，则抛出异常
                             if (postSize > maxPostSize) {
                                 parameters.setParseFailedReason(FailReason.POST_TOO_LARGE);
                                 throw new IllegalStateException(sm.getString(
