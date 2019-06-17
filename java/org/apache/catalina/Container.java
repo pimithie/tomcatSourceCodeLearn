@@ -81,7 +81,7 @@ import org.apache.juli.logging.Log;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-
+// 处理客户端的请求，通过一系列Valve的Pipeline(如果配置的话)
 public interface Container extends Lifecycle {
 
 
@@ -150,6 +150,7 @@ public interface Container extends Lifecycle {
      * no associated Loader, return the Loader associated with our parent
      * Container (if any); otherwise, return <code>null</code>.
      */
+    // 返回当前容器关联的类加载器
     public Loader getLoader();
 
 
@@ -158,6 +159,7 @@ public interface Container extends Lifecycle {
      *
      * @param loader The newly associated loader
      */
+    // 设置当前容器关联的类加载器
     public void setLoader(Loader loader);
 
 
@@ -201,6 +203,7 @@ public interface Container extends Lifecycle {
      * Return the Pipeline object that manages the Valves associated with
      * this Container.
      */
+    // 获取当前容器关联的PipeLine
     public Pipeline getPipeline();
 
 

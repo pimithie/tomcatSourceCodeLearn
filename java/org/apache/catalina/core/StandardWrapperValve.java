@@ -132,6 +132,7 @@ final class StandardWrapperValve
         // Allocate a servlet instance to process this request
         try {
             if (!unavailable) {
+            	// 若第一次进行访问，则进行Servlet的实例化
                 servlet = wrapper.allocate();
             }
         } catch (UnavailableException e) {
@@ -180,6 +181,7 @@ final class StandardWrapperValve
         // Create the filter chain for this request
         ApplicationFilterFactory factory =
             ApplicationFilterFactory.getInstance();
+        // 创建当前请求对应的过滤器链
         ApplicationFilterChain filterChain =
             factory.createFilterChain(request, wrapper, servlet);
 
@@ -200,6 +202,7 @@ final class StandardWrapperValve
                             filterChain.doFilterEvent(request.getEvent());
                             request.setComet(true);
                         } else {
+                        	// 类似于spring的AOP的通知调用，将过滤器通过doFilter逐一压栈调用
                             filterChain.doFilter(request.getRequest(),
                                     response.getResponse());
                         }

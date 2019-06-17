@@ -51,6 +51,7 @@ public interface Engine extends Container {
     /**
      * Return the default hostname for this Engine.
      */
+	// 获取当前Engine对应的默认host
     public String getDefaultHost();
 
 
@@ -59,6 +60,7 @@ public interface Engine extends Container {
      *
      * @param defaultHost The new default host
      */
+    // 设置当前Engine对应的默认host
     public void setDefaultHost(String defaultHost);
 
 
@@ -80,6 +82,7 @@ public interface Engine extends Container {
     /**
      * Return the <code>Service</code> with which we are associated (if any).
      */
+    // 获取当前Engine关联的Service
     public Service getService();
 
 
@@ -88,6 +91,7 @@ public interface Engine extends Container {
      *
      * @param service The service that owns this Engine
      */
+    // 设置当前Engine关联的Service
     public void setService(Service service);
 
 

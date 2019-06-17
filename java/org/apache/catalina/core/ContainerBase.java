@@ -167,6 +167,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * The child Containers belonging to this Container, keyed by name.
      */
+    // 当前容器的子容器
     protected HashMap<String, Container> children =
         new HashMap<String, Container>();
 
@@ -1113,9 +1114,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *  while processing this request
      */
     @Override
+    // 处理特定的请求
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
-
+    	// 通过一系列Valve
         pipeline.getFirst().invoke(request, response);
 
     }
