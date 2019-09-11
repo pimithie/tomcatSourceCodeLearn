@@ -128,7 +128,15 @@ import org.apache.tomcat.util.security.PermissionCheck;
  * application classes to instrument other classes in the same web
  * application. It does not permit instrumentation of system or container
  * classes or classes in other web apps.
- *
+ * 特定的web应用类加载器
+ * 此类是对jdk的URLClassLoader的重新实现，但对通常的URLClassLoader的子类进行兼容
+ * 此类默认的加载顺序为：
+ * 	1. jdk核心类库
+ *  2. WEB-INF/classes
+ *  3. WEB-INF/lib
+ *  4. tomcat的bin目录下的jar包
+ *  5. tomcat的lib目录下的jar(eg. servlet api...)
+ * 也可以通过指定delegate属性来将4,5提前到2,3之前
  * @author Remy Maucherat
  * @author Craig R. McClanahan
  */
@@ -1825,6 +1833,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             Class<?> clazz = null;
 
             // Log access to stopped classloader
+            // 当前组件未启动，抛出异常
             if (!started) {
                 try {
                     throw new IllegalStateException();
@@ -1834,6 +1843,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // (0) Check our previously loaded local class cache
+            // 检验之前被加载过的本地class缓存(存储在一个ConcurrentHashMap)
             clazz = findLoadedClass0(name);
             if (clazz != null) {
                 if (log.isDebugEnabled())
@@ -1844,6 +1854,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // (0.1) Check our previously loaded class cache
+            // 检验之前加载过的类(调用URLClassLoader的findLoadedClass方法，查询JVM中已经加载过的类)
             clazz = findLoadedClass(name);
             if (clazz != null) {
                 if (log.isDebugEnabled())
@@ -1856,6 +1867,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             // (0.2) Try loading the class with the system class loader, to prevent
             //       the webapp from overriding J2SE classes
             try {
+            	// 从jdk的核心类库中搜寻
                 clazz = j2seClassLoader.loadClass(name);
                 if (clazz != null) {
                     if (resolve)
@@ -1890,6 +1902,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             boolean delegateLoad = delegate || filter(name);
 
             // (1) Delegate to our parent if requested
+            // 如果配置了delegate属性，则先从bin,lib目录中加载
             if (delegateLoad) {
                 if (log.isDebugEnabled())
                     log.debug("  Delegating to parent classloader1 " + parent);
@@ -1908,6 +1921,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // (2) Search local repositories
+            // 从本地仓库(WEB-INF/class,lib)中进行加载
             if (log.isDebugEnabled())
                 log.debug("  Searching local repositories");
             try {
@@ -1924,6 +1938,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // (3) Delegate to parent unconditionally
+            // 未设置delegate，则进行无条件delegate
             if (!delegateLoad) {
                 if (log.isDebugEnabled())
                     log.debug("  Delegating to parent classloader at end: " + parent);
